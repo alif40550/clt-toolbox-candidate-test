@@ -14,6 +14,16 @@ class AnalysisPlotter {
      * @param {Object{beam : Beam, load : float, equation: Function}}  The equation data
      */
     plot(data) {
-        console.log('Plotting data : ', data);
+        // console.log('Plotting data : ', data);
+
+        const results = [];
+        const L = data.beam.primarySpan;
+        const step = L/10.0;
+
+        for(let i=0; i<=L; i+=step){
+            const x= i.toFixed(2);
+            results.push(data.equation(x));
+        }
+        // Todo : add chart 
     }
 }
