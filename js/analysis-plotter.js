@@ -21,7 +21,7 @@ class AnalysisPlotter {
     const step = l1 / 10.0;
 
     for (let i = 0; i <= l1; i += step) {
-      const x = i.toFixed(2);
+      const x = i;
       results.push(equation(x));
     }
     return results;
@@ -33,47 +33,46 @@ class AnalysisPlotter {
 
     if (formula == "shear-force") {
       for (let i = 0; i <= l1; i += step) {
-        const x = i.toFixed(2);
+        const x = i;
         results.push(equation(x));
       }
-      const peakLeft = results.push(equation(l1.toFixed(2)));
+      const peakLeft = results.push(equation(l1));
       for (let i = l1; i <= L; i += step) {
-        const x = i.toFixed(2);
+        const x = i;
         if (i == l1) {
           results.push(equation(x, "right"));
         } else {
           results.push(equation(x));
         }
       }
-      const maxL = results.push(equation(L.toFixed(2)));
-    } else if(formula=="bending-moment"){
+      const maxL = results.push(equation(L));
+    } else if (formula == "bending-moment") {
       for (let i = 0; i <= l1; i += step) {
-        const x = i.toFixed(2);
+        const x = i;
         results.push(equation(x));
       }
       for (let i = l1; i <= L; i += step) {
-        const x = i.toFixed(2);
+        const x = i;
         results.push(equation(x));
       }
       criticalPoints.forEach((point) => {
-        results.push(equation(point.toFixed(2)));
+        results.push(equation(point));
       });
-      const maxL = results.push(equation(L.toFixed(2)));
+      const maxL = results.push(equation(L));
       results = Array.from(results).sort((a, b) => a.x - b.x);
-    }
-    else{
-      let step = l1/10.0;
+    } else {
+      let step = l1 / 10.0;
       for (let i = 0; i <= l1; i += step) {
-        const x = i.toFixed(2);
+        const x = i;
         results.push(equation(x));
       }
-      step = l2/10.0;
-      for (let i = l1+step; i <= L; i += step) {
-        const x = i.toFixed(2);
+      step = l2 / 10.0;
+      for (let i = l1 + step; i <= L; i += step) {
+        const x = i;
         results.push(equation(x));
       }
       criticalPoints.forEach((point) => {
-        results.push(equation(point.toFixed(2)));
+        results.push(equation(point));
       });
       results = Array.from(results).sort((a, b) => a.x - b.x);
     }
@@ -92,5 +91,31 @@ class AnalysisPlotter {
       results = this.countTwoSpanUnequal(L, l1, data.equation, data.formula, data.criticalPoints);
     }
     console.log(results);
+
+    new Chart(document.getElementById(this.container), {
+      type: 'line',
+      data: {
+        labels: results.map(point => point.x),
+        datasets: [{
+          label: 'Dataset',
+          data: results.map(point => point.y),
+          borderColor: '#378ADD',
+          backgroundColor: 'rgba(55, 138, 221, 0.1)',
+          borderWidth: 2,
+          pointRadius: 5,
+          tension: 0.3,
+          fill: true,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { title: { display: true, text: 'X' } },
+          y: { title: { display: true, text: 'Y' } },
+        }
+      }
+    });
   }
 }

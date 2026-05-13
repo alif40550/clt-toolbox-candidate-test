@@ -282,11 +282,11 @@ BeamAnalysis.analyzer.twoSpanUnequal = class {
       if (x == 0 || x == L) {
         bendingMomentEquation = 0 * x;
       } else if (x > 0 && x < l1) {
-        bendingMomentEquation = -(r1 * x - 0.5 * w * Math.pow(x, 2));
+        bendingMomentEquation = (r1 * x - 0.5 * w * Math.pow(x, 2));
       } else if (x == l1) {
-        bendingMomentEquation = -(r1 * l1 - 0.5 * w * Math.pow(l1, 2));
+        bendingMomentEquation = (r1 * l1 - 0.5 * w * Math.pow(l1, 2));
       } else {
-        bendingMomentEquation = -(x * r1 + r2 * (x - l1) - 0.5 * w * Math.pow(x, 2));
+        bendingMomentEquation = (x * r1 + r2 * (x - l1) - 0.5 * w * Math.pow(x, 2));
       }
 
       return {
