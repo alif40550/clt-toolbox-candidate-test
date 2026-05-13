@@ -1,5 +1,96 @@
 "use strict";
-// Todo : split the analysis ploter to formulacounter class after finish
+
+class FormulaCounter {
+  constructor(beam, load, equation, formula) {
+    this.beam = beam;
+    this.load = load;
+    this.equation = equation;
+    this.formula = formula;
+    this.results = [];
+  }
+
+  getResults(){
+    return this.results;
+  }
+}
+
+class SimplySupportedCounter extends FormulaCounter {
+  constructor(beam, load, equation, formula) {
+    super(beam, load, equation, formula);
+  }
+  count() {
+    const l1 = this.beam.primarySpan;
+    const step = l1 / 10.0;
+
+    for (let i = 0; i <= l1; i += step) {
+      const x = i;
+      this.results.push(this.equation(x));
+    }
+    return super.getResults();
+  }
+}
+
+class TwoSpanUnequalCounter extends FormulaCounter {
+  constructor(beam, load, equation, formula, criticalPoints) {
+    super(beam, load, equation, formula);
+    this.criticalPoints = criticalPoints;
+  }
+  count() {
+    const l1 = this.beam.primarySpan;
+    const l2 = this.beam.secondarySpan;
+    const equation = this.equation;
+    const L = l1 + l2;
+    const step = L / 10.0;
+
+    if (this.formula == "shear-force") {
+      for (let i = 0; i <= l1; i += step) {
+        const x = i;
+        this.results.push(equation(x));
+      }
+      const peakLeft = this.results.push(equation(l1));
+      for (let i = l1; i <= L; i += step) {
+        const x = i;
+        if (i == l1) {
+          this.results.push(equation(x, "right"));
+        } else {
+          this.results.push(equation(x));
+        }
+      }
+      const maxL = this.results.push(equation(L));
+    } else if (this.formula == "bending-moment") {
+      for (let i = 0; i <= l1; i += step) {
+        const x = i;
+        this.results.push(equation(x));
+      }
+      for (let i = l1; i <= L; i += step) {
+        const x = i;
+        this.results.push(equation(x));
+      }
+      this.criticalPoints.forEach((point) => {
+        this.results.push(equation(point));
+      });
+      const maxL = this.results.push(equation(L));
+      this.results = Array.from(this.results).sort((a, b) => a.x - b.x);
+    } else {
+      let step = l1 / 10.0;
+      for (let i = 0; i <= l1; i += step) {
+        const x = i;
+        this.results.push(equation(x));
+      }
+      step = l2 / 10.0;
+      for (let i = l1 + step; i <= L; i += step) {
+        const x = i;
+        this.results.push(equation(x));
+      }
+      this.criticalPoints.forEach((point) => {
+        this.results.push(equation(point));
+      });
+      this.results = Array.from(this.results).sort((a, b) => a.x - b.x);
+    }
+
+    return super.getResults();
+  }
+}
 
 /**
  * Plot result from the beam analysis calculation into a graph
@@ -7,7 +98,6 @@
 class AnalysisPlotter {
   constructor(container, formulaCounter) {
     this.container = container;
-    this.formulaCounter = formulaCounter;
   }
 
   /**
@@ -15,107 +105,44 @@ class AnalysisPlotter {
    *
    * @param {Object{beam : Beam, load : float, equation: Function, condition : string, formula: string}}  The equation data
    */
-
-  countSimplySupported(l1, equation) {
-    let results = [];
-    const step = l1 / 10.0;
-
-    for (let i = 0; i <= l1; i += step) {
-      const x = i;
-      results.push(equation(x));
-    }
-    return results;
-  }
-  countTwoSpanUnequal(L, l1, equation, formula, criticalPoints) {
-    let results = [];
-    const step = L / 10.0;
-    const l2 = L - l1;
-
-    if (formula == "shear-force") {
-      for (let i = 0; i <= l1; i += step) {
-        const x = i;
-        results.push(equation(x));
-      }
-      const peakLeft = results.push(equation(l1));
-      for (let i = l1; i <= L; i += step) {
-        const x = i;
-        if (i == l1) {
-          results.push(equation(x, "right"));
-        } else {
-          results.push(equation(x));
-        }
-      }
-      const maxL = results.push(equation(L));
-    } else if (formula == "bending-moment") {
-      for (let i = 0; i <= l1; i += step) {
-        const x = i;
-        results.push(equation(x));
-      }
-      for (let i = l1; i <= L; i += step) {
-        const x = i;
-        results.push(equation(x));
-      }
-      criticalPoints.forEach((point) => {
-        results.push(equation(point));
-      });
-      const maxL = results.push(equation(L));
-      results = Array.from(results).sort((a, b) => a.x - b.x);
-    } else {
-      let step = l1 / 10.0;
-      for (let i = 0; i <= l1; i += step) {
-        const x = i;
-        results.push(equation(x));
-      }
-      step = l2 / 10.0;
-      for (let i = l1 + step; i <= L; i += step) {
-        const x = i;
-        results.push(equation(x));
-      }
-      criticalPoints.forEach((point) => {
-        results.push(equation(point));
-      });
-      results = Array.from(results).sort((a, b) => a.x - b.x);
-    }
-
-    return results;
-  }
   plot(data) {
-    let results = [];
-    const l1 = data.beam.primarySpan;
-    const l2 = data.beam.secondarySpan;
-    const L = l1 + l2;
+    let formulaCounter;
 
     if (data.condition == "simply-supported") {
-      results = this.countSimplySupported(l1, data.equation);
+      formulaCounter = new SimplySupportedCounter(data.beam, data.load, data.equation, data.formula);
     } else if (data.condition == "two-span-unequal") {
-      results = this.countTwoSpanUnequal(L, l1, data.equation, data.formula, data.criticalPoints);
+      formulaCounter = new TwoSpanUnequalCounter(data.beam, data.load, data.equation, data.formula, data.criticalPoints);
     }
+
+    const results = formulaCounter.count();
     console.log(results);
 
     new Chart(document.getElementById(this.container), {
-      type: 'line',
+      type: "line",
       data: {
-        labels: results.map(point => point.x),
-        datasets: [{
-          label: 'Dataset',
-          data: results.map(point => point.y),
-          borderColor: '#378ADD',
-          backgroundColor: 'rgba(55, 138, 221, 0.1)',
-          borderWidth: 2,
-          pointRadius: 5,
-          tension: 0.3,
-          fill: true,
-        }]
+        labels: results.map((point) => point.x),
+        datasets: [
+          {
+            label: "Dataset",
+            data: results.map((point) => point.y),
+            borderColor: "#378ADD",
+            backgroundColor: "rgba(55, 138, 221, 0.1)",
+            borderWidth: 2,
+            pointRadius: 5,
+            tension: 0.3,
+            fill: true,
+          },
+        ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          x: { title: { display: true, text: 'X' } },
-          y: { title: { display: true, text: 'Y' } },
-        }
-      }
+          x: { title: { display: true, text: "X" } },
+          y: { title: { display: true, text: "Y" } },
+        },
+      },
     });
   }
 }
