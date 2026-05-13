@@ -77,6 +77,12 @@ class BeamAnalysis {
    */
   getDeflection(beam, load, condition) {
     var analyzer = this.analyzer[condition];
+
+    let criticalPoints = null;     
+    if(condition == "two-span-unequal"){
+      criticalPoints = analyzer.getCriticalPoints(beam, load);
+    }
+
     if (analyzer) {
       return {
         beam: beam,
@@ -84,7 +90,7 @@ class BeamAnalysis {
         equation: analyzer.getDeflectionEquation(beam, load),
         condition: condition,
         formula: "deflection",
-        criticalPoints: analyzer.getCriticalPoints(beam, load),
+        criticalPoints: criticalPoints,
       };
     } else {
       throw new Error("Invalid condition");
@@ -93,6 +99,11 @@ class BeamAnalysis {
   getBendingMoment(beam, load, condition) {
     var analyzer = this.analyzer[condition];
 
+    let criticalPoints = null;     
+    if(condition == "two-span-unequal"){
+      criticalPoints = analyzer.getCriticalPoints(beam, load);
+    }
+
     if (analyzer) {
       return {
         beam: beam,
@@ -100,7 +111,7 @@ class BeamAnalysis {
         equation: analyzer.getBendingMomentEquation(beam, load),
         condition: condition,
         formula: "bending-moment",
-        criticalPoints: analyzer.getCriticalPoints(beam, load),
+        criticalPoints: criticalPoints,
       };
     } else {
       throw new Error("Invalid condition");
@@ -109,6 +120,11 @@ class BeamAnalysis {
   getShearForce(beam, load, condition) {
     var analyzer = this.analyzer[condition];
 
+    let criticalPoints = null;     
+    if(condition == "two-span-unequal"){
+      criticalPoints = analyzer.getCriticalPoints(beam, load);
+    }
+
     if (analyzer) {
       return {
         beam: beam,
@@ -116,7 +132,7 @@ class BeamAnalysis {
         equation: analyzer.getShearForceEquation(beam, load),
         condition: condition,
         formula: "shear-force",
-        criticalPoints: null, //shear-force doen't have critical points
+        criticalPoints: criticalPoints,
       };
     } else {
       throw new Error("Invalid condition");
@@ -275,18 +291,18 @@ BeamAnalysis.analyzer.twoSpanUnequal = class {
       const w = load;
       const l1 = beam.primarySpan;
       const l2 = beam.secondarySpan;
-      const L = l1+l2;
+      const L = l1 + l2;
 
       let bendingMomentEquation;
 
       if (x == 0 || x == L) {
         bendingMomentEquation = 0 * x;
       } else if (x > 0 && x < l1) {
-        bendingMomentEquation = (r1 * x - 0.5 * w * Math.pow(x, 2));
+        bendingMomentEquation = r1 * x - 0.5 * w * Math.pow(x, 2);
       } else if (x == l1) {
-        bendingMomentEquation = (r1 * l1 - 0.5 * w * Math.pow(l1, 2));
+        bendingMomentEquation = r1 * l1 - 0.5 * w * Math.pow(l1, 2);
       } else {
-        bendingMomentEquation = (x * r1 + r2 * (x - l1) - 0.5 * w * Math.pow(x, 2));
+        bendingMomentEquation = x * r1 + r2 * (x - l1) - 0.5 * w * Math.pow(x, 2);
       }
 
       return {
