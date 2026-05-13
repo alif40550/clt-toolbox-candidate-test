@@ -1,5 +1,12 @@
 "use strict";
-
+/**
+ * Parent class for formula counter
+ *
+ * @param {Object} beam         beam object 
+ * @param {Number} load         load
+ * @param {Function} equation   Equation function
+ * @param {String} formula      Formula type ex:"shear-force", etc.
+ */
 class FormulaCounter {
   constructor(beam, load, equation, formula) {
     this.beam = beam;
@@ -12,7 +19,14 @@ class FormulaCounter {
     return this.results;
   }
 }
-
+/**
+ * class for counting simply supported condition
+ *
+ * @param {Object} beam         beam object 
+ * @param {Number} load         load
+ * @param {Function} equation   Equation function
+ * @param {String} formula      Formula type ex:"shear-force", etc.
+ */
 class SimplySupportedCounter extends FormulaCounter {
   constructor(beam, load, equation, formula) {
     super(beam, load, equation, formula);
@@ -28,7 +42,15 @@ class SimplySupportedCounter extends FormulaCounter {
     return super.getResults();
   }
 }
-
+/**
+ * class for counting Two Span Unequal condition
+ *
+ * @param {Object} beam           beam object 
+ * @param {Number} load           load
+ * @param {Function} equation     Equation function
+ * @param {String} formula        Formula type ex:"shear-force", etc.
+ * @param {Array} criticalPoints  critical points for bending moments and deflection equation
+ */
 class TwoSpanUnequalCounter extends FormulaCounter {
   constructor(beam, load, equation, formula, criticalPoints) {
     super(beam, load, equation, formula);
@@ -113,7 +135,7 @@ class TwoSpanUnequalCounter extends FormulaCounter {
  * Plot result from the beam analysis calculation into a graph
  */
 class AnalysisPlotter {
-  constructor(container, formulaCounter) {
+  constructor(container) {
     this.container = container;
   }
 
