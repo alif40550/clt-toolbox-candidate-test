@@ -8,8 +8,7 @@ class FormulaCounter {
     this.formula = formula;
     this.results = [];
   }
-
-  getResults(){
+  getResults() {
     return this.results;
   }
 }
@@ -35,57 +34,75 @@ class TwoSpanUnequalCounter extends FormulaCounter {
     super(beam, load, equation, formula);
     this.criticalPoints = criticalPoints;
   }
-  count() {
+  addCriticalPoints() {
+    this.criticalPoints.forEach((point) => {
+      this.results.push(this.equation(point));
+    });
+    this.results = Array.from(this.results).sort((a, b) => a.x - b.x);
+
+    return super.getResults();
+  }
+  shearForce() {
     const l1 = this.beam.primarySpan;
     const l2 = this.beam.secondarySpan;
-    const equation = this.equation;
     const L = l1 + l2;
     const step = L / 10.0;
+    for (let x = 0; x <= l1; x += step) {
+      this.results.push(equation(x));
+    }
+    const peakLeft = this.results.push(equation(l1));
+    for (let x = l1; x <= L; x += step) {
+      if (x == l1) {
+        this.results.push(equation(x, "right"));
+      } else {
+        this.results.push(equation(x));
+      }
+    }
+    const maxL = this.results.push(equation(L));
 
+    return super.getResults();
+  }
+  bendingMoment() {
+    const l1 = this.beam.primarySpan;
+    const l2 = this.beam.secondarySpan;
+    const L = l1 + l2;
+    const step = L / 10.0;
+    for (let x = 0; x <= l1; x += step) {
+      this.results.push(equation(x));
+    }
+    for (let x = l1; x <= L; x += step) {
+      this.results.push(equation(x));
+    }
+    this.results = this.addCriticalPoints();
+    const maxL = this.results.push(equation(L));
+
+    return super.getResults();
+  }
+  deflection() {
+    const l1 = this.beam.primarySpan;
+    const l2 = this.beam.secondarySpan;
+    const L = l1 + l2;
+    let step = l1 / 10.0;
+    for (let x = 0; x <= l1; x += step) {
+      this.results.push(equation(x));
+    }
+    step = l2 / 10.0;
+    for (let x = l1 + step; x <= L; x += step) {
+      this.results.push(equation(x));
+    }
+    this.results = this.addCriticalPoints();
+
+    return super.getResults();
+  }
+  count() {
     if (this.formula == "shear-force") {
-      for (let i = 0; i <= l1; i += step) {
-        const x = i;
-        this.results.push(equation(x));
-      }
-      const peakLeft = this.results.push(equation(l1));
-      for (let i = l1; i <= L; i += step) {
-        const x = i;
-        if (i == l1) {
-          this.results.push(equation(x, "right"));
-        } else {
-          this.results.push(equation(x));
-        }
-      }
-      const maxL = this.results.push(equation(L));
+      this.results = this.shearForce();
     } else if (this.formula == "bending-moment") {
-      for (let i = 0; i <= l1; i += step) {
-        const x = i;
-        this.results.push(equation(x));
-      }
-      for (let i = l1; i <= L; i += step) {
-        const x = i;
-        this.results.push(equation(x));
-      }
-      this.criticalPoints.forEach((point) => {
-        this.results.push(equation(point));
-      });
-      const maxL = this.results.push(equation(L));
-      this.results = Array.from(this.results).sort((a, b) => a.x - b.x);
-    } else {
-      let step = l1 / 10.0;
-      for (let i = 0; i <= l1; i += step) {
-        const x = i;
-        this.results.push(equation(x));
-      }
-      step = l2 / 10.0;
-      for (let i = l1 + step; i <= L; i += step) {
-        const x = i;
-        this.results.push(equation(x));
-      }
-      this.criticalPoints.forEach((point) => {
-        this.results.push(equation(point));
-      });
-      this.results = Array.from(this.results).sort((a, b) => a.x - b.x);
+      this.results = this.bendingMoment();
+    } else if(this.formula == "deflection"){
+      this.results = this.deflection();
+    } else{
+      throw new Error("formula not valid");
     }
 
     return super.getResults();
