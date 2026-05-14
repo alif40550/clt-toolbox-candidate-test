@@ -5,13 +5,42 @@
                 <h2 class="text-[28px] font-bold text-gray-900   tracking-tight">Suppliers</h2>
                 <p class="mt-1.5 text-sm text-gray-500">Manage timber suppliers and material sourcing.</p>
             </div>
-            <div class="mt-4 sm:mt-0">
+            <div class="mt-4 sm:mt-0 flex gap-2">
+                <a href="{{ route('supplier.export') }}" class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-colors">
+                    <i class="ph ph-download-simple font-bold"></i>
+                    Export JSON
+                </a>
+                
+                <form action="{{ route('supplier.import') }}" method="POST" enctype="multipart/form-data" class="hidden" id="form-import-supplier">
+                    @csrf
+                    <input type="file" name="import_file" id="import_file_supplier" accept=".json" onchange="document.getElementById('form-import-supplier').submit()">
+                </form>
+                <button type="button" onclick="document.getElementById('import_file_supplier').click()" class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-colors">
+                    <i class="ph ph-upload-simple font-bold"></i>
+                    Import JSON
+                </button>
+
                 <button type="button" onclick="openModal('addSupplierModal')" class="inline-flex items-center gap-2 px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#3e7c5b] hover:bg-[#2f6348] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-colors">
                     <i class="ph ph-plus font-bold"></i>
                     Add Supplier
                 </button>
             </div>
         </div>
+        
+        <!-- Alerts -->
+        @if(session('success'))
+        <div class="mb-4 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-3">
+            <i class="ph ph-check-circle text-xl text-green-500"></i>
+            <span class="text-sm font-medium">{{ session('success') }}</span>
+        </div>
+        @endif
+        @if(session('error'))
+        <div class="mb-4 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-center gap-3">
+            <i class="ph ph-x-circle text-xl text-red-500"></i>
+            <span class="text-sm font-medium">{{ session('error') }}</span>
+        </div>
+        @endif
+
 
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <!-- Search -->
@@ -23,60 +52,66 @@
             </div>
         </div>
 
+        @if ($suppliers->isEmpty())
+            <div class="w-full">
+                <h1 class="italic w-fit mx-auto text-gray-500">No data</h1>
+            </div>
+        @else
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50/80">
-                        <tr>
-                            <th scope="col" class="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider w-1/3">
-                                Name
-                            </th>
-                            <th scope="col" class="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-                                Total Layups
-                            </th>
-                            <th scope="col" class="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-                                Created At
-                            </th>
-                            <th scope="col" class="px-6 py-4 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-100">
-                        @foreach ($suppliers as $supplier )
-                        <tr class="hover:bg-gray-50/80 transition-colors group">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <img class="rounded-full" src="https://ui-avatars.com/api/?name={{ $supplier->name }}" alt="{{ $supplier->name }}">
-                                    <div class="ml-4">
-                                            <a href="{{ route('supplier.show', $supplier) }}">
-                                                <div class="text-sm font-bold text-gray-900 hover:underline hover:text-blue-500">{{ $supplier->name }}</div>
-                                            </a>
-                                            <div class="text-[11px] text-gray-500 mt-0.5">ID: {{ 'SUP-'. $supplier->id }}</div>
-                                        </div>
-                                    </div>
-                                </td>
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50/80">
+                            <tr>
+                                <th scope="col" class="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider w-1/3">
+                                    Name
+                                </th>
+                                <th scope="col" class="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    Total Layups
+                                </th>
+                                <th scope="col" class="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    Created At
+                                </th>
+                                <th scope="col" class="px-6 py-4 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-100">
+                            @foreach ($suppliers as $supplier )
+                            <tr class="hover:bg-gray-50/80 transition-colors group">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-600">{{ $supplier->layups_count }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                    @formatDate($supplier->created_at) 
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <button onclick="openModal('editSupplierModal');prepareEditModal({{ $supplier->id }}, '{{ addslashes($supplier->name) }}')" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="Edit">
-                                            <i class="ph ph-pencil-simple text-lg"></i>
-                                        </button>
-                                        <button onclick="openModal('confirmDeleteModal');prepareDeleteModal({{ $supplier->id }})" class="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="Delete">
-                                            <i class="ph ph-trash text-lg"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                                    <div class="flex items-center">
+                                        <img class="rounded-full" src="https://ui-avatars.com/api/?name={{ $supplier->name }}" alt="{{ $supplier->name }}">
+                                        <div class="ml-4">
+                                                <a href="{{ route('supplier.show', $supplier) }}">
+                                                    <div class="text-sm font-bold text-gray-900 hover:underline hover:text-blue-500">{{ $supplier->name }}</div>
+                                                </a>
+                                                <div class="text-[11px] text-gray-500 mt-0.5">ID: {{ 'SUP-'. $supplier->id }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-600">{{ $supplier->layups_count }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                        @formatDate($supplier->created_at) 
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <button onclick="openModal('editSupplierModal');prepareEditModal({{ $supplier->id }}, '{{ addslashes($supplier->name) }}')" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="Edit">
+                                                <i class="ph ph-pencil-simple text-lg"></i>
+                                            </button>
+                                            <button onclick="openModal('confirmDeleteModal');prepareDeleteModal({{ $supplier->id }})" class="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="Delete">
+                                                <i class="ph ph-trash text-lg"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
     </main>
 
     <x-supplier.modal-add></x-supplier.modal-add>

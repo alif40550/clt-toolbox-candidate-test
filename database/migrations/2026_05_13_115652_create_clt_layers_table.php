@@ -17,6 +17,7 @@ return new class extends Migration
             $table->decimal('thickness');
             $table->decimal('width');
             $table->decimal('angle');
+            $table->dateTime('last_modified');
             $table->timestamps();
 
             $table->foreignId('layup_id')->constrained('clt_layups')->onDelete('cascade');
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('c_l_t__layers');
+        Schema::dropIfExists('clt_layers');
     }
 };

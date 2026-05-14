@@ -6,5 +6,9 @@ use Illuminate\Http\Request;
 
 class CLTLayerController extends Controller
 {
-    public function store
+    // Placeholder — logika layer dikelola via CLTLayupController::saveLayers
+    public function store(Request $request)
+    {
+        //
+    }
 }

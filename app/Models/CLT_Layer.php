@@ -12,6 +12,16 @@ class CLT_Layer extends Model
 
     protected $table = "clt_layers";
 
+    protected $fillable = [
+        'layup_id',
+        'layer_order',
+        'thickness',
+        'width',
+        'angle',
+        'grade',
+        'last_modified',
+    ];
+
     public function layup()
     {
         return $this->belongsTo(CLT_Layup::class, "layup_id");
