@@ -199,7 +199,7 @@
                 <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
                     Cancel
                 </button>
-                <button type="button" onclick="saveEditLayer()" class="px-4 py-2 text-sm font-medium text-white bg-brand-600 border border-transparent rounded-md hover:bg-brand-700 transition-colors shadow-sm">
+                <button type="button" onclick="saveEditLayer()" class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-brand-700 transition-colors shadow-sm">
                     Update Layer
                 </button>
             </div>
