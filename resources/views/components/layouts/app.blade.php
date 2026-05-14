@@ -35,6 +35,6 @@
     @include('components.navbar');
 
     {{ $slot }}
-
+<script src="{{ asset('js/modal.js') }}"></script>
 </body>
 </html>

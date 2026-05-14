@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CLTLayupController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,13 @@ Route::middleware('auth')->group(function () {
         'update' => 'supplier.update',
         'destroy' => 'supplier.destroy'
     ])->except(['create', 'edit']);
+
+    Route::resource('supplier.layup', CLTLayupController::class)->names([
+        'store' => 'supplier.layup.store',
+        'show' => 'supplier.layup.show',
+        'update' => 'supplier.layup.update',
+        'destroy' => 'supplier.layup.destroy'
+    ])->shallow()->except(['index', 'create', 'edit']);
 
 });
 

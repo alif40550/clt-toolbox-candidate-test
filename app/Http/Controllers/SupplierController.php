@@ -20,11 +20,16 @@ class SupplierController extends Controller
             'name' => $request->validated('supplierName'),
         ]);
 
-        return redirect()->route('supplier.index');
+        return redirect()->back();
     }
-    public function show()
+    public function show(Supplier $supplier)
     {
-        //
+        $supplier->load(['layups' => function($query){
+            $query->withCount('layers');
+        }]);
+        return view('supplier.show', [
+            'supplier' => $supplier,
+        ]);
     }
     public function update(SupplierRequest $request, Supplier $supplier)
     {   
@@ -32,13 +37,13 @@ class SupplierController extends Controller
             'name' => $request->validated('supplierName'),
         ]);
 
-        return redirect()->route('supplier.index');
+        return redirect()->back();
     }
     public function destroy(Supplier $supplier)
     {
         $supplier->delete();
 
-        return redirect()->route('supplier.index');
+        return redirect()->back();
     }
 
 }

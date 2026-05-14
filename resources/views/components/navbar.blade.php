@@ -43,7 +43,7 @@
 
                 <div class="flex items-center gap-3 cursor-pointer group">
                     <div class="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-gray-200 transition-colors">
-                        <i class="ph ph-user text-lg"></i>
+                        <img class="rounded-full" src="https://ui-avatars.com/api/?name={{ Auth::user()->name }}" alt="{{ Auth::user()->name }}">
                     </div>
                     <div class="hidden sm:block text-right">
                         <p class="text-sm font-bold text-gray-900 leading-none">{{ Auth::user()->name }}</p>

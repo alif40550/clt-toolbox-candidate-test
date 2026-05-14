@@ -11,6 +11,7 @@ class CLT_Layup extends Model
     use HasFactory;
 
     protected $table="clt_layups";
+    protected $fillable = ['name'];
 
     public function supplier()
     {
