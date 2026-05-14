@@ -13,7 +13,7 @@
                 
                 <form action="{{ route('supplier.import') }}" method="POST" enctype="multipart/form-data" class="hidden" id="form-import-supplier">
                     @csrf
-                    <input type="file" name="import_file" id="import_file_supplier" accept=".json" onchange="document.getElementById('form-import-supplier').submit()">
+                    <input type="file" name="import_file" id="import_file_supplier" accept=".json" onchange="handleSupplierImport(event)">
                 </form>
                 <button type="button" onclick="document.getElementById('import_file_supplier').click()" class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-colors">
                     <i class="ph ph-upload-simple font-bold"></i>
@@ -84,7 +84,7 @@
                                         <img class="rounded-full" src="https://ui-avatars.com/api/?name={{ $supplier->name }}" alt="{{ $supplier->name }}">
                                         <div class="ml-4">
                                                 <a href="{{ route('supplier.show', $supplier) }}">
-                                                    <div class="text-sm font-bold text-gray-900 hover:underline hover:text-blue-500">{{ $supplier->name }}</div>
+                                                    <div class="supplier-name-element text-sm font-bold text-gray-900 hover:underline hover:text-blue-500">{{ $supplier->name }}</div>
                                                 </a>
                                                 <div class="text-[11px] text-gray-500 mt-0.5">ID: {{ 'SUP-'. $supplier->id }}</div>
                                             </div>
@@ -117,4 +117,5 @@
     <x-supplier.modal-add></x-supplier.modal-add>
     <x-supplier.modal-update></x-supplier.modal-update>
     <x-supplier.modal-delete></x-supplier.modal-delete>
+    <x-supplier.modal-conflict></x-supplier.modal-conflict>
 </x-layouts.app>

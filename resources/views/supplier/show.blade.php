@@ -38,7 +38,7 @@
                 
                 <form action="{{ route('supplier.layup.import', $supplier) }}" method="POST" enctype="multipart/form-data" class="hidden" id="form-import-layup">
                     @csrf
-                    <input type="file" name="import_file" id="import_file_layup" accept=".json" onchange="document.getElementById('form-import-layup').submit()">
+                    <input type="file" name="import_file" id="import_file_layup" accept=".json" onchange="handleLayupImport(event)">
                 </form>
                 <button type="button" onclick="document.getElementById('import_file_layup').click()" class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 shadow-sm text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
                     <i class="ph ph-upload-simple text-lg text-gray-500"></i>
@@ -87,7 +87,7 @@
                             @foreach ( $supplier->layups as $layup )
                             <tr class="hover:bg-gray-50/50 transition-colors">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500">L-{{ $layup->id }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $layup->name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 layup-name-element">{{ $layup->name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $layup->total_thickness }}</td> 
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="inline-flex items-center justify-center w-6 h-6 rounded bg-gray-100 text-gray-800 text-xs font-bold border border-gray-200 shadow-sm">{{ $layup->layers_count }}</span>
@@ -113,4 +113,5 @@
     <x-supplier.modal-update></x-supplier.modal-update>
     <x-layup.modal-add :supplier="$supplier"></x-layup.modal-add>
     <x-layup.modal-delete></x-layup.modal-delete>
+    <x-layup.modal-conflict></x-layup.modal-conflict>
 </x-layouts.app>
